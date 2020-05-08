@@ -197,26 +197,28 @@ def list(config=None):
         result = colored('Listing entries:', 'white', attrs=["bold", ]) + "\n\n"
         result_stack = ""
         for host in storm_.list_entries(True):
-
             if host.get("type") == 'entry':
                 if not host.get("host") == "*":
-                    result += "    {0} -> {1}@{2}:{3}".format(
-                        colored(host["host"], 'green', attrs=["bold", ]),
-                        host.get("options").get(
-                            "user", get_default("user", storm_.defaults)
-                        ),
-                        host.get("options").get(
-                            "hostname", "[hostname_not_specified]"
-                        ),
-                        host.get("options").get(
-                            "port", get_default("port", storm_.defaults)
+                    myhost = host["host"]
+                    user = host.get("options").get("user", get_default("user", storm_.defaults))
+                    hostname = host.get("options").get("hostname", myhost)
+                    port = host.get("options").get("port", get_default("port", storm_.defaults))
+                    proxy = colored(host.get("options").get("proxyjump", None), 'green', attrs=["bold", ])
+                    myhost = colored(host["host"], 'green', attrs=["bold", ])
+
+                    if host.get("options").get("proxyjump", None):
+                        result += "    {0} -> {1}@{2}:{3} via {4}".format(
+                            myhost, user, hostname, port, proxy
                         )
-                    )
+                    else:
+                        result += "    {0} -> {1}@{2}:{3}".format(
+                            myhost, user, hostname, port, proxy
+                        )
 
                     extra = False
                     for key, value in six.iteritems(host.get("options")):
 
-                        if not key in ["user", "hostname", "port"]:
+                        if not key in ["user", "hostname", "port", "proxyjump"]:
                             if not extra:
                                 custom_options = colored(
                                     '\n\t[custom options] ', 'white'
@@ -250,7 +252,6 @@ def list(config=None):
                                 value,
                             )
                     result_stack = result_stack[0:-1] + "\n"
-
         result += result_stack
         print(get_formatted_message(result, ""))
     except Exception as error:
