@@ -5,7 +5,7 @@ from __future__ import print_function
 from operator import itemgetter
 import re
 from shutil import copyfile
-
+from storm.utils import (get_formatted_message, colored)
 from .parsers.ssh_config_parser import ConfigParser
 from .defaults import get_default
 
@@ -108,18 +108,25 @@ class Storm(object):
         results = self.ssh_config.search_host(search_string)
         formatted_results = []
         for host_entry in results:
-            formatted_results.append("    {0} -> {1}@{2}:{3}\n".format(
-                host_entry.get("host"),
-                host_entry.get("options").get(
-                    "user", get_default("user", self.defaults)
-                ),
-                host_entry.get("options").get(
-                    "hostname", "[hostname_not_specified]"
-                ),
-                host_entry.get("options").get(
-                    "port", get_default("port", self.defaults)
-                ),
-            ))
+            agent = ''
+            control = ''
+            host = colored(host_entry.get("host"), 'green', attrs=["bold", ])
+            options = host_entry.get("options")
+            hostname = options.get('hostname', 'no-hostname')
+            user = options.get('user', 'root')
+            port = options.get('port', 22)
+            proxy = options.get('proxyjump')
+            if options.get('forwardagent'):
+                agent = colored('agent', 'red', attrs=["bold", ])
+            if options.get('controlmaster'):
+                control = colored('control', 'red', attrs=["bold", ])
+            if proxy:
+                proxy = colored(proxy, 'green', attrs=["bold", ])
+                formatted_results.append("    {0} -> {1}@{2}:{3} via {4} {5} {6}\n".format(
+                    host, user, hostname, port, proxy, agent, control))
+            else:
+                formatted_results.append("    {0} -> {1}@{2}:{3} {4} {5}\n".format(
+                    host, user, hostname, port, agent, control))
 
         return formatted_results
 
