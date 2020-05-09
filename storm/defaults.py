@@ -3,7 +3,7 @@
 import getpass
 
 DEFAULT_PORT = 22
-DEFAULT_USER = getpass.getuser()
+DEFAULT_USER = 'root'
 
 
 def get_default(key, defaults={}):
