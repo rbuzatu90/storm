@@ -23,7 +23,6 @@ setup(
     install_requires=list(filter(None, [
         "paramiko",
         "termcolor",
-        "flask",
         "argparse" if sys.version_info[:2] < (2, 7) else None,
         "six",
     ])),
