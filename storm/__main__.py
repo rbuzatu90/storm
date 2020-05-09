@@ -205,14 +205,21 @@ def list(config=None):
                     port = host.get("options").get("port", get_default("port", storm_.defaults))
                     proxy = colored(host.get("options").get("proxyjump", None), 'green', attrs=["bold", ])
                     myhost = colored(host["host"], 'green', attrs=["bold", ])
+                    agent=''
+                    control=''
+                    if host.get("options").get("forwardagent", None):
+                        agent=colored('agent', 'red', attrs=["bold", ])
+                    if host.get("options").get("controlmaster", None):
+                        control=colored('control', 'red', attrs=["bold", ])
+                    #control = colored(host.get("options").get("controlmaster", None), 'red', attrs=["bold", ])
 
                     if host.get("options").get("proxyjump", None):
-                        result += "    {0} -> {1}@{2}:{3} via {4}".format(
-                            myhost, user, hostname, port, proxy
+                        result += "    {0} -> {1}@{2}:{3} via {4} {5} {6}".format(
+                            myhost, user, hostname, port, proxy, agent, control
                         )
                     else:
-                        result += "    {0} -> {1}@{2}:{3}".format(
-                            myhost, user, hostname, port, proxy
+                        result += "    {0} -> {1}@{2}:{3} {4} {5}".format(
+                            myhost, user, hostname, port, agent, control
                         )
 
                     extra = False
